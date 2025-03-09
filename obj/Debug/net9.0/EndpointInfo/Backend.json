@@ -5,36 +5,53 @@
     "version": "v1"
   },
   "paths": {
-    "/api/admin": {
+    "/api/Admins/me": {
       "get": {
         "tags": [
-          "Admin"
+          "Admins"
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Admin"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Admin"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Admin"
+                }
+              }
+            }
           }
         }
       },
       "put": {
         "tags": [
-          "Admin"
+          "Admins"
         ],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Utilisateur"
+                "$ref": "#/components/schemas/Admin"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/Utilisateur"
+                "$ref": "#/components/schemas/Admin"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/Utilisateur"
+                "$ref": "#/components/schemas/Admin"
               }
             }
           }
@@ -46,85 +63,26 @@
         }
       }
     },
-    "/api/Classe": {
+    "/api/Auth/login": {
       "post": {
         "tags": [
-          "Classe"
+          "Auth"
         ],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Classe"
+                "$ref": "#/components/schemas/UserLoginDto"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/Classe"
+                "$ref": "#/components/schemas/UserLoginDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/Classe"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/Classe"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Classe"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Classe"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/Classe/{id}": {
-      "put": {
-        "tags": [
-          "Classe"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Classe"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Classe"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/Classe"
+                "$ref": "#/components/schemas/UserLoginDto"
               }
             }
           }
@@ -132,584 +90,6 @@
         "responses": {
           "200": {
             "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Classe"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/Cours": {
-      "post": {
-        "tags": [
-          "Cours"
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Cours"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Cours"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/Cours"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/Cours"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Cours"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Cours"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/Cours/{id}": {
-      "put": {
-        "tags": [
-          "Cours"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Cours"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Cours"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/Cours"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Cours"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/Enseignant": {
-      "post": {
-        "tags": [
-          "Enseignant"
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Enseignant"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Enseignant"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/Enseignant"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/Enseignant"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Enseignant"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Enseignant"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/Enseignant/{id}": {
-      "put": {
-        "tags": [
-          "Enseignant"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Enseignant"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Enseignant"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/Enseignant"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Enseignant"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/Etudiant": {
-      "post": {
-        "tags": [
-          "Etudiant"
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Etudiant"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Etudiant"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/Etudiant"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/Etudiant"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Etudiant"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Etudiant"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/Etudiant/{id}": {
-      "put": {
-        "tags": [
-          "Etudiant"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Etudiant"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Etudiant"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/Etudiant"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Etudiant"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/Identifiant": {
-      "get": {
-        "tags": [
-          "Identifiant"
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Identifiant"
-                  }
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Identifiant"
-                  }
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Identifiant"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Identifiant"
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Identifiant"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Identifiant"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/Identifiant"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/Identifiant"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Identifiant"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Identifiant"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/Identifiant/{id}": {
-      "get": {
-        "tags": [
-          "Identifiant"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/Identifiant"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Identifiant"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Identifiant"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "Identifiant"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Identifiant"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Identifiant"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/Identifiant"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Identifiant"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/WeatherForecast": {
-      "get": {
-        "tags": [
-          "WeatherForecast"
-        ],
-        "operationId": "GetWeatherForecast",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/WeatherForecast"
-                  }
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/WeatherForecast"
-                  }
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/WeatherForecast"
-                  }
-                }
-              }
-            }
           }
         }
       }
@@ -747,14 +127,12 @@
             "format": "email"
           },
           "password": {
-            "maxLength": 255,
+            "maxLength": 100,
             "minLength": 1,
             "type": "string"
           },
           "role": {
-            "maxLength": 50,
-            "minLength": 1,
-            "type": "string"
+            "$ref": "#/components/schemas/RoleUtilisateur"
           },
           "forums": {
             "type": "array",
@@ -762,6 +140,19 @@
               "$ref": "#/components/schemas/Forum"
             },
             "nullable": true
+          },
+          "commentaires": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Commentaire"
+            },
+            "nullable": true
+          },
+          "identifiant": {
+            "$ref": "#/components/schemas/Identifiant"
+          },
+          "photoProfilFichier": {
+            "$ref": "#/components/schemas/Fichier"
           },
           "classes": {
             "type": "array",
@@ -805,6 +196,41 @@
               "$ref": "#/components/schemas/Cours"
             },
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Commentaire": {
+        "required": [
+          "contenu"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "contenu": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "dateCreation": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "leconId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "lecon": {
+            "$ref": "#/components/schemas/Lecon"
+          },
+          "utilisateurId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "utilisateur": {
+            "$ref": "#/components/schemas/Utilisateur"
           }
         },
         "additionalProperties": false
@@ -896,14 +322,12 @@
             "format": "email"
           },
           "password": {
-            "maxLength": 255,
+            "maxLength": 100,
             "minLength": 1,
             "type": "string"
           },
           "role": {
-            "maxLength": 50,
-            "minLength": 1,
-            "type": "string"
+            "$ref": "#/components/schemas/RoleUtilisateur"
           },
           "forums": {
             "type": "array",
@@ -911,6 +335,19 @@
               "$ref": "#/components/schemas/Forum"
             },
             "nullable": true
+          },
+          "commentaires": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Commentaire"
+            },
+            "nullable": true
+          },
+          "identifiant": {
+            "$ref": "#/components/schemas/Identifiant"
+          },
+          "photoProfilFichier": {
+            "$ref": "#/components/schemas/Fichier"
           },
           "cours": {
             "type": "array",
@@ -959,14 +396,12 @@
             "format": "email"
           },
           "password": {
-            "maxLength": 255,
+            "maxLength": 100,
             "minLength": 1,
             "type": "string"
           },
           "role": {
-            "maxLength": 50,
-            "minLength": 1,
-            "type": "string"
+            "$ref": "#/components/schemas/RoleUtilisateur"
           },
           "forums": {
             "type": "array",
@@ -974,6 +409,19 @@
               "$ref": "#/components/schemas/Forum"
             },
             "nullable": true
+          },
+          "commentaires": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Commentaire"
+            },
+            "nullable": true
+          },
+          "identifiant": {
+            "$ref": "#/components/schemas/Identifiant"
+          },
+          "photoProfilFichier": {
+            "$ref": "#/components/schemas/Fichier"
           },
           "soumissions": {
             "type": "array",
@@ -1035,6 +483,9 @@
               "$ref": "#/components/schemas/Soumission"
             },
             "nullable": true
+          },
+          "statut": {
+            "$ref": "#/components/schemas/StatutEvaluation"
           }
         },
         "additionalProperties": false
@@ -1087,6 +538,14 @@
           },
           "soumission": {
             "$ref": "#/components/schemas/Soumission"
+          },
+          "utilisateurId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "utilisateur": {
+            "$ref": "#/components/schemas/Utilisateur"
           }
         },
         "additionalProperties": false
@@ -1194,9 +653,25 @@
               "$ref": "#/components/schemas/Fichier"
             },
             "nullable": true
+          },
+          "commentaires": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Commentaire"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false
+      },
+      "RoleUtilisateur": {
+        "enum": [
+          0,
+          1,
+          2
+        ],
+        "type": "integer",
+        "format": "int32"
       },
       "Soumission": {
         "type": "object",
@@ -1229,6 +704,31 @@
           },
           "etudiant": {
             "$ref": "#/components/schemas/Etudiant"
+          },
+          "statut": {
+            "$ref": "#/components/schemas/StatutEvaluation"
+          }
+        },
+        "additionalProperties": false
+      },
+      "StatutEvaluation": {
+        "enum": [
+          0,
+          1
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "UserLoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "password": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -1263,14 +763,12 @@
             "format": "email"
           },
           "password": {
-            "maxLength": 255,
+            "maxLength": 100,
             "minLength": 1,
             "type": "string"
           },
           "role": {
-            "maxLength": 50,
-            "minLength": 1,
-            "type": "string"
+            "$ref": "#/components/schemas/RoleUtilisateur"
           },
           "forums": {
             "type": "array",
@@ -1278,29 +776,19 @@
               "$ref": "#/components/schemas/Forum"
             },
             "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "WeatherForecast": {
-        "type": "object",
-        "properties": {
-          "date": {
-            "type": "string",
-            "format": "date"
           },
-          "temperatureC": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "temperatureF": {
-            "type": "integer",
-            "format": "int32",
-            "readOnly": true
-          },
-          "summary": {
-            "type": "string",
+          "commentaires": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Commentaire"
+            },
             "nullable": true
+          },
+          "identifiant": {
+            "$ref": "#/components/schemas/Identifiant"
+          },
+          "photoProfilFichier": {
+            "$ref": "#/components/schemas/Fichier"
           }
         },
         "additionalProperties": false

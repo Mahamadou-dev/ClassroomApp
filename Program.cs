@@ -3,6 +3,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Diagnostics; // Pour la gestion des erreurs globales
 using System.Text.Json; // Pour la sérialisation des erreurs
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Configure DbContext
@@ -29,6 +33,21 @@ builder.Services.AddCors(options =>
               .AllowAnyHeader(); // Autorise tous les en-têtes
     });
 });
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["Jwt:SecretKey"])),
+            ValidateIssuer = false,
+            ValidateAudience = false
+        };
+    });
+
+// Ajout de l'autorisation
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
