@@ -166,3 +166,7 @@ C:\Learning\Programmation\DATA_BASE\C#.Net\Skills\Backend\Backend\obj\Debug\net9
 C:\Learning\Programmation\DATA_BASE\C#.Net\Skills\Backend\Backend\bin\Debug\net9.0\Swashbuckle.AspNetCore.Swagger.dll
 C:\Learning\Programmation\DATA_BASE\C#.Net\Skills\Backend\Backend\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerGen.dll
 C:\Learning\Programmation\DATA_BASE\C#.Net\Skills\Backend\Backend\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerUI.dll
+C:\Learning\Programmation\DATA_BASE\C#.Net\Skills\Backend\Backend\bin\Debug\net9.0\BCrypt.Net.dll
+C:\Learning\Programmation\DATA_BASE\C#.Net\Skills\Backend\Backend\bin\Debug\net9.0\BCrypt.Net-Core.dll
+C:\Learning\Programmation\DATA_BASE\C#.Net\Skills\Backend\Backend\bin\Debug\net9.0\BCrypt.Net-Next.dll
+C:\Learning\Programmation\DATA_BASE\C#.Net\Skills\Backend\Backend\bin\Debug\net9.0\BCrypt.Net-Next.StrongName.dll

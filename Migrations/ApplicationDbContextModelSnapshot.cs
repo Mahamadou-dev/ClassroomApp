@@ -48,6 +48,36 @@ namespace Backend.Migrations
                     b.ToTable("Classes");
                 });
 
+            modelBuilder.Entity("Backend.Models.Commentaire", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Contenu")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset>("DateCreation")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("LeconId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UtilisateurId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LeconId");
+
+                    b.HasIndex("UtilisateurId");
+
+                    b.ToTable("Commentaires");
+                });
+
             modelBuilder.Entity("Backend.Models.Cours", b =>
                 {
                     b.Property<int>("Id")
@@ -101,6 +131,9 @@ namespace Backend.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("Statut")
+                        .HasColumnType("int");
+
                     b.Property<string>("Titre")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -143,6 +176,12 @@ namespace Backend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("UtilisateurId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("UtilisateurId1")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("EvaluationId");
@@ -150,6 +189,12 @@ namespace Backend.Migrations
                     b.HasIndex("LeconId");
 
                     b.HasIndex("SoumissionId");
+
+                    b.HasIndex("UtilisateurId");
+
+                    b.HasIndex("UtilisateurId1")
+                        .IsUnique()
+                        .HasFilter("[UtilisateurId1] IS NOT NULL");
 
                     b.ToTable("Fichiers");
                 });
@@ -205,9 +250,15 @@ namespace Backend.Migrations
                     b.Property<int>("UtilisateurId")
                         .HasColumnType("int");
 
+                    b.Property<int>("UtilisateurId1")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("UtilisateurId");
+                    b.HasIndex("UtilisateurId")
+                        .IsUnique();
+
+                    b.HasIndex("UtilisateurId1");
 
                     b.ToTable("Identifiants");
                 });
@@ -282,6 +333,9 @@ namespace Backend.Migrations
                     b.Property<int>("EvaluationId")
                         .HasColumnType("int");
 
+                    b.Property<int>("Statut")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("EnseignantId");
@@ -301,11 +355,6 @@ namespace Backend.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasMaxLength(13)
-                        .HasColumnType("nvarchar(13)");
-
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -317,47 +366,43 @@ namespace Backend.Migrations
 
                     b.Property<string>("Password")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Prenom")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<string>("Role")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                    b.Property<int>("Role")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Utilisateurs");
+                    b.ToTable("Utilisateurs", (string)null);
 
-                    b.HasDiscriminator().HasValue("Utilisateur");
-
-                    b.UseTphMappingStrategy();
+                    b.UseTptMappingStrategy();
                 });
 
             modelBuilder.Entity("Backend.Models.Admin", b =>
                 {
                     b.HasBaseType("Backend.Models.Utilisateur");
 
-                    b.HasDiscriminator().HasValue("Admin");
+                    b.ToTable("Admins", (string)null);
                 });
 
             modelBuilder.Entity("Backend.Models.Enseignant", b =>
                 {
                     b.HasBaseType("Backend.Models.Utilisateur");
 
-                    b.HasDiscriminator().HasValue("Enseignant");
+                    b.ToTable("Enseignants", (string)null);
                 });
 
             modelBuilder.Entity("Backend.Models.Etudiant", b =>
                 {
                     b.HasBaseType("Backend.Models.Utilisateur");
 
-                    b.HasDiscriminator().HasValue("Etudiant");
+                    b.ToTable("Etudiants", (string)null);
                 });
 
             modelBuilder.Entity("Backend.Models.Classe", b =>
@@ -369,6 +414,25 @@ namespace Backend.Migrations
                         .IsRequired();
 
                     b.Navigation("Admin");
+                });
+
+            modelBuilder.Entity("Backend.Models.Commentaire", b =>
+                {
+                    b.HasOne("Backend.Models.Lecon", "Lecon")
+                        .WithMany("Commentaires")
+                        .HasForeignKey("LeconId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Backend.Models.Utilisateur", "Utilisateur")
+                        .WithMany("Commentaires")
+                        .HasForeignKey("UtilisateurId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Lecon");
+
+                    b.Navigation("Utilisateur");
                 });
 
             modelBuilder.Entity("Backend.Models.Cours", b =>
@@ -419,11 +483,22 @@ namespace Backend.Migrations
                         .WithMany("Fichiers")
                         .HasForeignKey("SoumissionId");
 
+                    b.HasOne("Backend.Models.Utilisateur", "Utilisateur")
+                        .WithMany()
+                        .HasForeignKey("UtilisateurId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Backend.Models.Utilisateur", null)
+                        .WithOne("PhotoProfilFichier")
+                        .HasForeignKey("Backend.Models.Fichier", "UtilisateurId1");
+
                     b.Navigation("Evaluation");
 
                     b.Navigation("Lecon");
 
                     b.Navigation("Soumission");
+
+                    b.Navigation("Utilisateur");
                 });
 
             modelBuilder.Entity("Backend.Models.Forum", b =>
@@ -447,9 +522,15 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.Models.Identifiant", b =>
                 {
+                    b.HasOne("Backend.Models.Utilisateur", null)
+                        .WithOne("Identifiant")
+                        .HasForeignKey("Backend.Models.Identifiant", "UtilisateurId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("Backend.Models.Utilisateur", "Utilisateur")
                         .WithMany()
-                        .HasForeignKey("UtilisateurId")
+                        .HasForeignKey("UtilisateurId1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -501,6 +582,33 @@ namespace Backend.Migrations
                     b.Navigation("Evaluation");
                 });
 
+            modelBuilder.Entity("Backend.Models.Admin", b =>
+                {
+                    b.HasOne("Backend.Models.Utilisateur", null)
+                        .WithOne()
+                        .HasForeignKey("Backend.Models.Admin", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Backend.Models.Enseignant", b =>
+                {
+                    b.HasOne("Backend.Models.Utilisateur", null)
+                        .WithOne()
+                        .HasForeignKey("Backend.Models.Enseignant", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Backend.Models.Etudiant", b =>
+                {
+                    b.HasOne("Backend.Models.Utilisateur", null)
+                        .WithOne()
+                        .HasForeignKey("Backend.Models.Etudiant", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Backend.Models.Classe", b =>
                 {
                     b.Navigation("Cours");
@@ -524,6 +632,8 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.Models.Lecon", b =>
                 {
+                    b.Navigation("Commentaires");
+
                     b.Navigation("Fichiers");
                 });
 
@@ -534,7 +644,14 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.Models.Utilisateur", b =>
                 {
+                    b.Navigation("Commentaires");
+
                     b.Navigation("Forums");
+
+                    b.Navigation("Identifiant")
+                        .IsRequired();
+
+                    b.Navigation("PhotoProfilFichier");
                 });
 
             modelBuilder.Entity("Backend.Models.Admin", b =>
