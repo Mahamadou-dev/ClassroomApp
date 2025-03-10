@@ -4,6 +4,7 @@ using Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250310135305_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -370,13 +373,9 @@ namespace Backend.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<int>("Role")
-                        .HasColumnType("int");
-
-                    b.Property<string>("RoleString")
+                    b.Property<string>("Role")
                         .IsRequired()
-                        .HasMaxLength(13)
-                        .HasColumnType("nvarchar(13)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -385,30 +384,28 @@ namespace Backend.Migrations
 
                     b.ToTable("Utilisateurs", (string)null);
 
-                    b.HasDiscriminator<string>("RoleString").HasValue("Utilisateur");
-
-                    b.UseTphMappingStrategy();
+                    b.UseTptMappingStrategy();
                 });
 
             modelBuilder.Entity("Backend.Models.Admin", b =>
                 {
                     b.HasBaseType("Backend.Models.Utilisateur");
 
-                    b.HasDiscriminator().HasValue("Admin");
+                    b.ToTable("Admins", (string)null);
                 });
 
             modelBuilder.Entity("Backend.Models.Enseignant", b =>
                 {
                     b.HasBaseType("Backend.Models.Utilisateur");
 
-                    b.HasDiscriminator().HasValue("Enseignant");
+                    b.ToTable("Enseignants", (string)null);
                 });
 
             modelBuilder.Entity("Backend.Models.Etudiant", b =>
                 {
                     b.HasBaseType("Backend.Models.Utilisateur");
 
-                    b.HasDiscriminator().HasValue("Etudiant");
+                    b.ToTable("Etudiants", (string)null);
                 });
 
             modelBuilder.Entity("Backend.Models.Classe", b =>
@@ -580,6 +577,33 @@ namespace Backend.Migrations
                     b.Navigation("Evaluation");
                 });
 
+            modelBuilder.Entity("Backend.Models.Admin", b =>
+                {
+                    b.HasOne("Backend.Models.Utilisateur", null)
+                        .WithOne()
+                        .HasForeignKey("Backend.Models.Admin", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Backend.Models.Enseignant", b =>
+                {
+                    b.HasOne("Backend.Models.Utilisateur", null)
+                        .WithOne()
+                        .HasForeignKey("Backend.Models.Enseignant", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Backend.Models.Etudiant", b =>
+                {
+                    b.HasOne("Backend.Models.Utilisateur", null)
+                        .WithOne()
+                        .HasForeignKey("Backend.Models.Etudiant", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Backend.Models.Classe", b =>
                 {
                     b.Navigation("Cours");
@@ -619,7 +643,8 @@ namespace Backend.Migrations
 
                     b.Navigation("Forums");
 
-                    b.Navigation("Identifiant");
+                    b.Navigation("Identifiant")
+                        .IsRequired();
 
                     b.Navigation("PhotoProfilFichier");
                 });

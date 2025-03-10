@@ -19,9 +19,9 @@ namespace Backend.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Nom = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     Prenom = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Password = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Role = table.Column<int>(type: "int", nullable: false)
+                    Role = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -88,8 +88,7 @@ namespace Backend.Migrations
                     CIN = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     SuperKey = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    UtilisateurId = table.Column<int>(type: "int", nullable: false),
-                    UtilisateurId1 = table.Column<int>(type: "int", nullable: true)
+                    UtilisateurId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -98,14 +97,7 @@ namespace Backend.Migrations
                         name: "FK_Identifiants_Utilisateurs_UtilisateurId",
                         column: x => x.UtilisateurId,
                         principalTable: "Utilisateurs",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Identifiants_Utilisateurs_UtilisateurId1",
-                        column: x => x.UtilisateurId1,
-                        principalTable: "Utilisateurs",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -173,7 +165,7 @@ namespace Backend.Migrations
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DateLimite = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     CoursId = table.Column<int>(type: "int", nullable: false),
-                    Statut = table.Column<int>(type: "int", nullable: false)
+                    Statut = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -310,8 +302,7 @@ namespace Backend.Migrations
                     LeconId = table.Column<int>(type: "int", nullable: true),
                     EvaluationId = table.Column<int>(type: "int", nullable: true),
                     SoumissionId = table.Column<int>(type: "int", nullable: true),
-                    UtilisateurId = table.Column<int>(type: "int", nullable: true),
-                    UtilisateurId1 = table.Column<int>(type: "int", nullable: true)
+                    UtilisateurId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -320,26 +311,23 @@ namespace Backend.Migrations
                         name: "FK_Fichiers_Evaluations_EvaluationId",
                         column: x => x.EvaluationId,
                         principalTable: "Evaluations",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Fichiers_Lecons_LeconId",
                         column: x => x.LeconId,
                         principalTable: "Lecons",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Fichiers_Soumissions_SoumissionId",
                         column: x => x.SoumissionId,
                         principalTable: "Soumissions",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Fichiers_Utilisateurs_UtilisateurId",
-                        column: x => x.UtilisateurId,
-                        principalTable: "Utilisateurs",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Fichiers_Utilisateurs_UtilisateurId1",
-                        column: x => x.UtilisateurId1,
+                        name: "FK_Fichiers_Utilisateurs_UtilisateurId",
+                        column: x => x.UtilisateurId,
                         principalTable: "Utilisateurs",
                         principalColumn: "Id");
                 });
@@ -370,6 +358,12 @@ namespace Backend.Migrations
                 column: "AdminId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Classes_Nom",
+                table: "Classes",
+                column: "Nom",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Commentaires_LeconId",
                 table: "Commentaires",
                 column: "LeconId");
@@ -383,6 +377,11 @@ namespace Backend.Migrations
                 name: "IX_Cours_ClasseId",
                 table: "Cours",
                 column: "ClasseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Cours_ClasseId_EnseignantId",
+                table: "Cours",
+                columns: new[] { "ClasseId", "EnseignantId" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Cours_EnseignantId",
@@ -417,14 +416,9 @@ namespace Backend.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Fichiers_UtilisateurId",
                 table: "Fichiers",
-                column: "UtilisateurId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Fichiers_UtilisateurId1",
-                table: "Fichiers",
-                column: "UtilisateurId1",
+                column: "UtilisateurId",
                 unique: true,
-                filter: "[UtilisateurId1] IS NOT NULL");
+                filter: "[UtilisateurId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Forums_CoursId",
@@ -441,11 +435,6 @@ namespace Backend.Migrations
                 table: "Identifiants",
                 column: "UtilisateurId",
                 unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Identifiants_UtilisateurId1",
-                table: "Identifiants",
-                column: "UtilisateurId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Lecons_CoursId",
@@ -471,6 +460,12 @@ namespace Backend.Migrations
                 name: "IX_Soumissions_EvaluationId",
                 table: "Soumissions",
                 column: "EvaluationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Utilisateurs_Email",
+                table: "Utilisateurs",
+                column: "Email",
+                unique: true);
         }
 
         /// <inheritdoc />

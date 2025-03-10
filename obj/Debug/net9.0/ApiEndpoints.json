@@ -1,41 +1,5 @@
 [
   {
-    "ContainingType": "Backend.Controllers.AdminsController",
-    "Method": "GetMyInfo",
-    "RelativePath": "api/Admins/me",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [],
-    "ReturnTypes": [
-      {
-        "Type": "Backend.Models.Admin",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 200
-      }
-    ]
-  },
-  {
-    "ContainingType": "Backend.Controllers.AdminsController",
-    "Method": "UpdateMyInfo",
-    "RelativePath": "api/Admins/me",
-    "HttpMethod": "PUT",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "admin",
-        "Type": "Backend.Models.Admin",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
     "ContainingType": "Backend.Controllers.AuthController",
     "Method": "Login",
     "RelativePath": "api/Auth/login",

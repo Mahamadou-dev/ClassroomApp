@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250309003639_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250310165559_Modifications")]
+    partial class Modifications
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -47,6 +47,9 @@ namespace Backend.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AdminId");
+
+                    b.HasIndex("Nom")
+                        .IsUnique();
 
                     b.ToTable("Classes");
                 });
@@ -114,6 +117,8 @@ namespace Backend.Migrations
 
                     b.HasIndex("EtudiantId");
 
+                    b.HasIndex("ClasseId", "EnseignantId");
+
                     b.ToTable("Cours");
                 });
 
@@ -134,8 +139,9 @@ namespace Backend.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Statut")
-                        .HasColumnType("int");
+                    b.Property<string>("Statut")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Titre")
                         .IsRequired()
@@ -182,9 +188,6 @@ namespace Backend.Migrations
                     b.Property<int?>("UtilisateurId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("UtilisateurId1")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("EvaluationId");
@@ -193,11 +196,9 @@ namespace Backend.Migrations
 
                     b.HasIndex("SoumissionId");
 
-                    b.HasIndex("UtilisateurId");
-
-                    b.HasIndex("UtilisateurId1")
+                    b.HasIndex("UtilisateurId")
                         .IsUnique()
-                        .HasFilter("[UtilisateurId1] IS NOT NULL");
+                        .HasFilter("[UtilisateurId] IS NOT NULL");
 
                     b.ToTable("Fichiers");
                 });
@@ -253,15 +254,10 @@ namespace Backend.Migrations
                     b.Property<int>("UtilisateurId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UtilisateurId1")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("UtilisateurId")
                         .IsUnique();
-
-                    b.HasIndex("UtilisateurId1");
 
                     b.ToTable("Identifiants");
                 });
@@ -360,7 +356,7 @@ namespace Backend.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Nom")
                         .IsRequired()
@@ -377,10 +373,14 @@ namespace Backend.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<int>("Role")
-                        .HasColumnType("int");
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
 
                     b.ToTable("Utilisateurs", (string)null);
 
@@ -476,24 +476,22 @@ namespace Backend.Migrations
                 {
                     b.HasOne("Backend.Models.Evaluation", "Evaluation")
                         .WithMany("Fichiers")
-                        .HasForeignKey("EvaluationId");
+                        .HasForeignKey("EvaluationId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Backend.Models.Lecon", "Lecon")
                         .WithMany("Fichiers")
-                        .HasForeignKey("LeconId");
+                        .HasForeignKey("LeconId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("Backend.Models.Soumission", "Soumission")
                         .WithMany("Fichiers")
-                        .HasForeignKey("SoumissionId");
-
-                    b.HasOne("Backend.Models.Utilisateur", "Utilisateur")
-                        .WithMany()
-                        .HasForeignKey("UtilisateurId")
+                        .HasForeignKey("SoumissionId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Backend.Models.Utilisateur", null)
+                    b.HasOne("Backend.Models.Utilisateur", "Utilisateur")
                         .WithOne("PhotoProfilFichier")
-                        .HasForeignKey("Backend.Models.Fichier", "UtilisateurId1");
+                        .HasForeignKey("Backend.Models.Fichier", "UtilisateurId");
 
                     b.Navigation("Evaluation");
 
@@ -525,16 +523,10 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.Models.Identifiant", b =>
                 {
-                    b.HasOne("Backend.Models.Utilisateur", null)
+                    b.HasOne("Backend.Models.Utilisateur", "Utilisateur")
                         .WithOne("Identifiant")
                         .HasForeignKey("Backend.Models.Identifiant", "UtilisateurId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Backend.Models.Utilisateur", "Utilisateur")
-                        .WithMany()
-                        .HasForeignKey("UtilisateurId1")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Utilisateur");

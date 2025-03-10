@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Data;
 
 namespace Backend.Models
 {
@@ -37,17 +38,29 @@ namespace Backend.Models
             [MaxLength(100)]
             public string Password { get; set; } = string.Empty;
 
-            [Required]
-            public RoleUtilisateur Role { get; set; } // Enum pour les rôles
+        [Required]
+                public RoleUtilisateur Role { get; set; } // Enum pour les rôles
 
-            // Navigation properties
-            public ICollection<Forum> Forums { get; set; } = new List<Forum>();
+                // Champ de stockage pour RoleString
+                private string _roleString;
+
+                // Propriété RoleString avec getter et setter
+                public string RoleString
+                {
+                    get => _roleString ?? Role.ToString(); // Retourne la valeur calculée si _roleString est null
+                    set => _roleString = value; // Permet à EF Core de définir la valeur
+                }
+
+
+        // Navigation properties
+        public ICollection<Forum> Forums { get; set; } = new List<Forum>();
             public ICollection<Commentaire> Commentaires { get; set; } = new List<Commentaire>();
 
-            // Relation avec Identifiant
-            public Identifiant Identifiant { get; set; } // Un utilisateur a un identifiant
-            // Relation avec Fichier (photo de profil)
-           public Fichier? PhotoProfilFichier { get; set; } // Relation avec Fichier
+        // Relation avec Identifiant
+            public Identifiant? Identifiant { get; set; }
+
+
+            public Fichier? PhotoProfilFichier { get; set; } // Relation avec Fichier
     }
 
     public class Etudiant : Utilisateur
@@ -122,6 +135,8 @@ namespace Backend.Models
         public int UtilisateurId { get; set; }
         public Utilisateur Utilisateur { get; set; }
     }
+  
+
 
     public class Evaluation
     {
@@ -133,6 +148,8 @@ namespace Backend.Models
 
         public string? Description { get; set; }
 
+        [Required]
+        [CustomValidation(typeof(EvaluationValidator), nameof(EvaluationValidator.ValiderDateLimite))]
         public DateTimeOffset DateLimite { get; set; }
 
         [ForeignKey("Cours")]

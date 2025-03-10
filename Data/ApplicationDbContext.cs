@@ -1,4 +1,5 @@
-﻿using Backend.Models;
+﻿using System;
+using Backend.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Data
@@ -13,7 +14,7 @@ namespace Backend.Data
         public DbSet<Utilisateur> Utilisateurs { get; set; }
         public DbSet<Etudiant> Etudiants { get; set; }
         public DbSet<Enseignant> Enseignants { get; set; }
-        public DbSet<Admin> Admin { get; set; }
+        public DbSet<Admin> Admins { get; set; }
         public DbSet<Classe> Classes { get; set; }
         public DbSet<Cours> Cours { get; set; }
         public DbSet<Evaluation> Evaluations { get; set; }
@@ -23,17 +24,21 @@ namespace Backend.Data
         public DbSet<Lecon> Lecons { get; set; }
         public DbSet<Note> Notes { get; set; }
         public DbSet<Soumission> Soumissions { get; set; }
-        public DbSet<Commentaire> Commentaires { get; set; } // Nouveau DbSet pour Commentaire
+        public DbSet<Commentaire> Commentaires { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // Configuration de l'héritage
-            modelBuilder.Entity<Utilisateur>().ToTable("Utilisateurs");
-            modelBuilder.Entity<Etudiant>().ToTable("Etudiants");
-            modelBuilder.Entity<Enseignant>().ToTable("Enseignants");
-            modelBuilder.Entity<Admin>().ToTable("Admins");
+            // Configuration de l'héritage (stratégie TPH)
+            modelBuilder.Entity<Utilisateur>().ToTable("Utilisateurs"); // Une seule table pour tous les utilisateurs
+
+            // Configuration du discriminator
+            modelBuilder.Entity<Utilisateur>()
+                .HasDiscriminator<string>("RoleString")
+                .HasValue<Etudiant>("Etudiant")
+                .HasValue<Enseignant>("Enseignant")
+                .HasValue<Admin>("Admin");
 
             // Configuration des relations
             modelBuilder.Entity<Cours>()
@@ -54,6 +59,12 @@ namespace Backend.Data
                 .HasForeignKey(s => s.EtudiantId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<Soumission>()
+                .HasOne(s => s.Evaluation)
+                .WithMany(e => e.Soumissions)
+                .HasForeignKey(s => s.EvaluationId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             modelBuilder.Entity<Commentaire>()
                 .HasOne(c => c.Lecon)
                 .WithMany(l => l.Commentaires)
@@ -66,18 +77,45 @@ namespace Backend.Data
                 .HasForeignKey(c => c.UtilisateurId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Configuration de la relation Utilisateur -> Identifiant
-            modelBuilder.Entity<Utilisateur>()
-                .HasOne(u => u.Identifiant)
-                .WithOne()
+            modelBuilder.Entity<Identifiant>()
+                .HasOne(i => i.Utilisateur)
+                .WithOne(u => u.Identifiant)
                 .HasForeignKey<Identifiant>(i => i.UtilisateurId)
-                .OnDelete(DeleteBehavior.Restrict); // Utiliser Restrict au lieu de Cascade
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Utilisateur>()
+                .HasIndex(u => u.Email)
+                .IsUnique();
+
+            modelBuilder.Entity<Cours>()
+               .HasIndex(c => new { c.ClasseId, c.EnseignantId });
+
+            modelBuilder.Entity<Classe>()
+               .HasIndex(c => c.Nom)
+               .IsUnique();
 
             // Configuration de la relation Fichier -> Utilisateur (pour la photo de profil)
+            modelBuilder.Entity<Utilisateur>()
+                .HasOne(u => u.PhotoProfilFichier)
+                .WithOne(f => f.Utilisateur)
+                .HasForeignKey<Fichier>(f => f.UtilisateurId);
+
             modelBuilder.Entity<Fichier>()
-                .HasOne(f => f.Utilisateur)
-                .WithMany()
-                .HasForeignKey(f => f.UtilisateurId)
+                 .HasOne(f => f.Lecon)
+                 .WithMany(l => l.Fichiers)
+                 .HasForeignKey(f => f.LeconId)
+                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Fichier>()
+                .HasOne(f => f.Evaluation)
+                .WithMany(e => e.Fichiers)
+                .HasForeignKey(f => f.EvaluationId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Fichier>()
+                .HasOne(f => f.Soumission)
+                .WithMany(s => s.Fichiers)
+                .HasForeignKey(f => f.SoumissionId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Configuration des index
@@ -89,6 +127,10 @@ namespace Backend.Data
 
             modelBuilder.Entity<Evaluation>()
                 .HasIndex(e => e.CoursId);
+
+            modelBuilder.Entity<Evaluation>()
+                .Property(e => e.Statut)
+                .HasConversion<string>();
 
             modelBuilder.Entity<Forum>()
                 .HasIndex(f => f.CoursId);
@@ -118,7 +160,7 @@ namespace Backend.Data
                 .HasIndex(f => f.SoumissionId);
 
             modelBuilder.Entity<Fichier>()
-                .HasIndex(f => f.UtilisateurId); // Index pour la photo de profil
+                .HasIndex(f => f.UtilisateurId);
         }
     }
 }
