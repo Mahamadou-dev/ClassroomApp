@@ -1,22 +1,19 @@
-﻿using System;
-using Backend.Models;
+﻿using Backend.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Data
 {
-    public class ApplicationDbContext : DbContext
+    public class AppDbContext : DbContext
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
-        {
-        }
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-        // DbSets
         public DbSet<Utilisateur> Utilisateurs { get; set; }
         public DbSet<Etudiant> Etudiants { get; set; }
         public DbSet<Enseignant> Enseignants { get; set; }
         public DbSet<Admin> Admins { get; set; }
         public DbSet<Classe> Classes { get; set; }
         public DbSet<Cours> Cours { get; set; }
+        public DbSet<Commentaire> Commentaires { get; set; }
         public DbSet<Evaluation> Evaluations { get; set; }
         public DbSet<Fichier> Fichiers { get; set; }
         public DbSet<Forum> Forums { get; set; }
@@ -24,14 +21,14 @@ namespace Backend.Data
         public DbSet<Lecon> Lecons { get; set; }
         public DbSet<Note> Notes { get; set; }
         public DbSet<Soumission> Soumissions { get; set; }
-        public DbSet<Commentaire> Commentaires { get; set; }
+        public DbSet<Message> Messages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
             // Configuration de l'héritage (stratégie TPH)
-            modelBuilder.Entity<Utilisateur>().ToTable("Utilisateurs"); // Une seule table pour tous les utilisateurs
+            modelBuilder.Entity<Utilisateur>().ToTable("Utilisateurs");
 
             // Configuration du discriminator
             modelBuilder.Entity<Utilisateur>()
@@ -40,103 +37,114 @@ namespace Backend.Data
                 .HasValue<Enseignant>("Enseignant")
                 .HasValue<Admin>("Admin");
 
-            // Configuration des relations
+            // Configuration des relations Utilisateur - Identifiant
+            modelBuilder.Entity<Utilisateur>()
+                .HasOne(u => u.Identifiant)
+                .WithOne(i => i.Utilisateur)
+                .HasForeignKey<Identifiant>(i => i.UtilisateurId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Configuration des relations Etudiant - Classe
+            modelBuilder.Entity<Etudiant>()
+                .HasOne(e => e.Classe)
+                .WithMany(c => c.Etudiants)
+                .HasForeignKey(e => e.ClasseId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Configuration des relations Classe - Admin
+            modelBuilder.Entity<Classe>()
+                .HasOne(c => c.Admin)
+                .WithMany(a => a.Classes)
+                .HasForeignKey(c => c.AdminId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Configuration des relations Cours - Enseignant
             modelBuilder.Entity<Cours>()
                 .HasOne(c => c.Enseignant)
                 .WithMany(e => e.Cours)
                 .HasForeignKey(c => c.EnseignantId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // Configuration des relations Forum - Cours
             modelBuilder.Entity<Forum>()
-                .HasOne(f => f.Utilisateur)
-                .WithMany(u => u.Forums)
-                .HasForeignKey(f => f.UtilisateurId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .HasOne(f => f.Cours)
+                .WithOne(c => c.Forum)
+                .HasForeignKey<Forum>(f => f.CoursId)
+                .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<Soumission>()
-                .HasOne(s => s.Etudiant)
-                .WithMany(e => e.Soumissions)
-                .HasForeignKey(s => s.EtudiantId)
-                .OnDelete(DeleteBehavior.Restrict);
+            // Configuration des relations Leçon - Cours
+            modelBuilder.Entity<Lecon>()
+                .HasOne(l => l.Cours)
+                .WithMany(c => c.Lecons)
+                .HasForeignKey(l => l.CoursId)
+                .OnDelete(DeleteBehavior.Cascade);
 
+            // Configuration des relations Commentaire - Leçon
+            modelBuilder.Entity<Commentaire>()
+                .HasOne(c => c.Lecon)
+                .WithMany(l => l.Commentaires)
+                .HasForeignKey(c => c.LeconId)
+                .OnDelete(DeleteBehavior.Cascade);
+               
+            // Configuration des relations Soumission - Evaluation
             modelBuilder.Entity<Soumission>()
                 .HasOne(s => s.Evaluation)
                 .WithMany(e => e.Soumissions)
                 .HasForeignKey(s => s.EvaluationId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<Commentaire>()
-                .HasOne(c => c.Lecon)
-                .WithMany(l => l.Commentaires)
-                .HasForeignKey(c => c.LeconId)
-                .OnDelete(DeleteBehavior.Restrict);
+            // Configuration des relations Note - Soumission
+            modelBuilder.Entity<Note>()
+                .HasOne(n => n.Soumission)
+                .WithOne(s => s.Note)
+                .HasForeignKey<Note>(n => n.SoumissionId)
+                .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<Commentaire>()
-                .HasOne(c => c.Utilisateur)
-                .WithMany(u => u.Commentaires)
-                .HasForeignKey(c => c.UtilisateurId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Identifiant>()
-                .HasOne(i => i.Utilisateur)
-                .WithOne(u => u.Identifiant)
-                .HasForeignKey<Identifiant>(i => i.UtilisateurId)
-                .OnDelete(DeleteBehavior.NoAction);
-
-            modelBuilder.Entity<Utilisateur>()
-                .HasIndex(u => u.Email)
-                .IsUnique();
-
-            modelBuilder.Entity<Cours>()
-               .HasIndex(c => new { c.ClasseId, c.EnseignantId });
-
-            modelBuilder.Entity<Classe>()
-               .HasIndex(c => c.Nom)
-               .IsUnique();
-
-            // Configuration de la relation Fichier -> Utilisateur (pour la photo de profil)
-            modelBuilder.Entity<Utilisateur>()
-                .HasOne(u => u.PhotoProfilFichier)
-                .WithOne(f => f.Utilisateur)
-                .HasForeignKey<Fichier>(f => f.UtilisateurId);
-
-            modelBuilder.Entity<Fichier>()
-                 .HasOne(f => f.Lecon)
-                 .WithMany(l => l.Fichiers)
-                 .HasForeignKey(f => f.LeconId)
-                 .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<Fichier>()
-                .HasOne(f => f.Evaluation)
-                .WithMany(e => e.Fichiers)
-                .HasForeignKey(f => f.EvaluationId)
-                .OnDelete(DeleteBehavior.Restrict);
-
+            // Configuration des relations Fichier - Soumission
             modelBuilder.Entity<Fichier>()
                 .HasOne(f => f.Soumission)
                 .WithMany(s => s.Fichiers)
                 .HasForeignKey(f => f.SoumissionId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // Configuration des relations Fichier - Utilisateur (photo de profil)
+            modelBuilder.Entity<Fichier>()
+                .HasOne(f => f.Utilisateur)
+                .WithOne(u => u.PhotoProfilFichier)
+                .HasForeignKey<Fichier>(f => f.UtilisateurId)
+                .OnDelete(DeleteBehavior.SetNull);
+
             // Configuration des index
-            modelBuilder.Entity<Cours>()
-                .HasIndex(c => c.ClasseId);
+            modelBuilder.Entity<Utilisateur>()
+                .HasIndex(u => u.Email)
+                .IsUnique();
+
+            modelBuilder.Entity<Identifiant>()
+                .HasIndex(i => i.CIN)
+                .IsUnique();
+
+            modelBuilder.Entity<Identifiant>()
+                .HasIndex(i => i.SuperKey)
+                .IsUnique();
+
+            modelBuilder.Entity<Classe>()
+                .HasIndex(c => c.Nom)
+                .IsUnique();
 
             modelBuilder.Entity<Cours>()
-                .HasIndex(c => c.EnseignantId);
+                .HasIndex(c => new { c.ClasseId, c.EnseignantId });
 
             modelBuilder.Entity<Evaluation>()
                 .HasIndex(e => e.CoursId);
 
-            modelBuilder.Entity<Evaluation>()
-                .Property(e => e.Statut)
-                .HasConversion<string>();
-
             modelBuilder.Entity<Forum>()
                 .HasIndex(f => f.CoursId);
 
-            modelBuilder.Entity<Forum>()
-                .HasIndex(f => f.UtilisateurId);
+            modelBuilder.Entity<Message>()
+                .HasIndex(m => m.ForumId);
+
+            modelBuilder.Entity<Message>()
+                .HasIndex(m => m.UtilisateurId);
 
             modelBuilder.Entity<Soumission>()
                 .HasIndex(s => s.EvaluationId);

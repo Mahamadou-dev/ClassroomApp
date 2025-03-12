@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Backend.Migrations
 {
-    [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(AppDbContext))]
+    partial class AppDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
@@ -108,8 +108,6 @@ namespace Backend.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ClasseId");
-
                     b.HasIndex("EnseignantId");
 
                     b.HasIndex("EtudiantId");
@@ -134,10 +132,6 @@ namespace Backend.Migrations
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Statut")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Titre")
@@ -211,21 +205,10 @@ namespace Backend.Migrations
                     b.Property<int>("CoursId")
                         .HasColumnType("int");
 
-                    b.Property<DateTimeOffset>("DatePublication")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("Message")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("UtilisateurId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("CoursId");
-
-                    b.HasIndex("UtilisateurId");
+                    b.HasIndex("CoursId")
+                        .IsUnique();
 
                     b.ToTable("Forums");
                 });
@@ -239,22 +222,34 @@ namespace Backend.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("CIN")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("EstUtilise")
+                        .HasColumnType("bit");
 
                     b.Property<string>("SuperKey")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Type")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UtilisateurId")
+                    b.Property<int?>("UtilisateurId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CIN")
+                        .IsUnique()
+                        .HasFilter("[CIN] IS NOT NULL");
+
+                    b.HasIndex("SuperKey")
+                        .IsUnique()
+                        .HasFilter("[SuperKey] IS NOT NULL");
+
                     b.HasIndex("UtilisateurId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[UtilisateurId] IS NOT NULL");
 
                     b.ToTable("Identifiants");
                 });
@@ -288,6 +283,36 @@ namespace Backend.Migrations
                     b.ToTable("Lecons");
                 });
 
+            modelBuilder.Entity("Backend.Models.Message", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Contenu")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset>("DatePublication")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("ForumId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UtilisateurId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ForumId");
+
+                    b.HasIndex("UtilisateurId");
+
+                    b.ToTable("Messages");
+                });
+
             modelBuilder.Entity("Backend.Models.Note", b =>
                 {
                     b.Property<int>("Id")
@@ -304,7 +329,8 @@ namespace Backend.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("SoumissionId");
+                    b.HasIndex("SoumissionId")
+                        .IsUnique();
 
                     b.ToTable("Notes");
                 });
@@ -327,9 +353,6 @@ namespace Backend.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("EvaluationId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Statut")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -408,6 +431,11 @@ namespace Backend.Migrations
                 {
                     b.HasBaseType("Backend.Models.Utilisateur");
 
+                    b.Property<int>("ClasseId")
+                        .HasColumnType("int");
+
+                    b.HasIndex("ClasseId");
+
                     b.HasDiscriminator().HasValue("Etudiant");
                 });
 
@@ -416,7 +444,7 @@ namespace Backend.Migrations
                     b.HasOne("Backend.Models.Admin", "Admin")
                         .WithMany("Classes")
                         .HasForeignKey("AdminId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Admin");
@@ -427,13 +455,13 @@ namespace Backend.Migrations
                     b.HasOne("Backend.Models.Lecon", "Lecon")
                         .WithMany("Commentaires")
                         .HasForeignKey("LeconId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Backend.Models.Utilisateur", "Utilisateur")
                         .WithMany("Commentaires")
                         .HasForeignKey("UtilisateurId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Lecon");
@@ -479,13 +507,11 @@ namespace Backend.Migrations
                 {
                     b.HasOne("Backend.Models.Evaluation", "Evaluation")
                         .WithMany("Fichiers")
-                        .HasForeignKey("EvaluationId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("EvaluationId");
 
                     b.HasOne("Backend.Models.Lecon", "Lecon")
                         .WithMany("Fichiers")
-                        .HasForeignKey("LeconId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("LeconId");
 
                     b.HasOne("Backend.Models.Soumission", "Soumission")
                         .WithMany("Fichiers")
@@ -494,7 +520,8 @@ namespace Backend.Migrations
 
                     b.HasOne("Backend.Models.Utilisateur", "Utilisateur")
                         .WithOne("PhotoProfilFichier")
-                        .HasForeignKey("Backend.Models.Fichier", "UtilisateurId");
+                        .HasForeignKey("Backend.Models.Fichier", "UtilisateurId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Evaluation");
 
@@ -508,20 +535,12 @@ namespace Backend.Migrations
             modelBuilder.Entity("Backend.Models.Forum", b =>
                 {
                     b.HasOne("Backend.Models.Cours", "Cours")
-                        .WithMany("Forums")
-                        .HasForeignKey("CoursId")
+                        .WithOne("Forum")
+                        .HasForeignKey("Backend.Models.Forum", "CoursId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Backend.Models.Utilisateur", "Utilisateur")
-                        .WithMany("Forums")
-                        .HasForeignKey("UtilisateurId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.Navigation("Cours");
-
-                    b.Navigation("Utilisateur");
                 });
 
             modelBuilder.Entity("Backend.Models.Identifiant", b =>
@@ -529,8 +548,7 @@ namespace Backend.Migrations
                     b.HasOne("Backend.Models.Utilisateur", "Utilisateur")
                         .WithOne("Identifiant")
                         .HasForeignKey("Backend.Models.Identifiant", "UtilisateurId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Utilisateur");
                 });
@@ -546,11 +564,30 @@ namespace Backend.Migrations
                     b.Navigation("Cours");
                 });
 
+            modelBuilder.Entity("Backend.Models.Message", b =>
+                {
+                    b.HasOne("Backend.Models.Forum", "Forum")
+                        .WithMany("Messages")
+                        .HasForeignKey("ForumId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Backend.Models.Utilisateur", "Utilisateur")
+                        .WithMany("Messages")
+                        .HasForeignKey("UtilisateurId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Forum");
+
+                    b.Navigation("Utilisateur");
+                });
+
             modelBuilder.Entity("Backend.Models.Note", b =>
                 {
                     b.HasOne("Backend.Models.Soumission", "Soumission")
-                        .WithMany()
-                        .HasForeignKey("SoumissionId")
+                        .WithOne("Note")
+                        .HasForeignKey("Backend.Models.Note", "SoumissionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -566,7 +603,7 @@ namespace Backend.Migrations
                     b.HasOne("Backend.Models.Etudiant", "Etudiant")
                         .WithMany("Soumissions")
                         .HasForeignKey("EtudiantId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Backend.Models.Evaluation", "Evaluation")
@@ -580,16 +617,30 @@ namespace Backend.Migrations
                     b.Navigation("Evaluation");
                 });
 
+            modelBuilder.Entity("Backend.Models.Etudiant", b =>
+                {
+                    b.HasOne("Backend.Models.Classe", "Classe")
+                        .WithMany("Etudiants")
+                        .HasForeignKey("ClasseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Classe");
+                });
+
             modelBuilder.Entity("Backend.Models.Classe", b =>
                 {
                     b.Navigation("Cours");
+
+                    b.Navigation("Etudiants");
                 });
 
             modelBuilder.Entity("Backend.Models.Cours", b =>
                 {
                     b.Navigation("Evaluations");
 
-                    b.Navigation("Forums");
+                    b.Navigation("Forum")
+                        .IsRequired();
 
                     b.Navigation("Lecons");
                 });
@@ -599,6 +650,11 @@ namespace Backend.Migrations
                     b.Navigation("Fichiers");
 
                     b.Navigation("Soumissions");
+                });
+
+            modelBuilder.Entity("Backend.Models.Forum", b =>
+                {
+                    b.Navigation("Messages");
                 });
 
             modelBuilder.Entity("Backend.Models.Lecon", b =>
@@ -611,15 +667,18 @@ namespace Backend.Migrations
             modelBuilder.Entity("Backend.Models.Soumission", b =>
                 {
                     b.Navigation("Fichiers");
+
+                    b.Navigation("Note");
                 });
 
             modelBuilder.Entity("Backend.Models.Utilisateur", b =>
                 {
                     b.Navigation("Commentaires");
 
-                    b.Navigation("Forums");
+                    b.Navigation("Identifiant")
+                        .IsRequired();
 
-                    b.Navigation("Identifiant");
+                    b.Navigation("Messages");
 
                     b.Navigation("PhotoProfilFichier");
                 });

@@ -1,46 +1,18 @@
 using Backend.Data;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
-using Microsoft.AspNetCore.Diagnostics;
-using System.Text.Json;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System.Text;
-using Microsoft.Extensions.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configure logging
-builder.Logging.ClearProviders();
-builder.Logging.AddConsole();
-builder.Logging.AddDebug();
+// Configuration de la base de données
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Configure DbContext
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
-           .LogTo(Console.WriteLine, LogLevel.Information));
-
-// Add Controllers
-builder.Services.AddControllers();
-
-// Configure Swagger
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Your API Name", Version = "v1" });
-});
-
-// Configure CORS
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAll", policy =>
-    {
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader();
-    });
-});
-
-// Configure JWT Authentication
+// Configuration de l'authentification JWT
 var jwtSecretKey = builder.Configuration["Jwt:SecretKey"];
 if (string.IsNullOrEmpty(jwtSecretKey))
 {
@@ -59,65 +31,54 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-// Add Authorization
-builder.Services.AddAuthorization();
+// Configuration de l'autorisation
+builder.Services.AddAuthorization(options =>
+{
+    // Politique pour les admins uniquement
+    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+
+    // Politique pour les admins et les enseignants
+    options.AddPolicy("AdminAndEnseignant", policy => policy.RequireRole("Admin", "Enseignant"));
+});
+
+// Ajouter les contrôleurs
+builder.Services.AddControllers();
+
+// Configuration de Swagger
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Backend API", Version = "v1" });
+});
 
 var app = builder.Build();
 
-// Initialize Database with Test Data
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    var context = services.GetRequiredService<ApplicationDbContext>();
-    await DbInitializer.Initialize(context);
-}
-
-// Configure Middleware Pipeline
-
-// Swagger UI in Development
+// Middleware pour Swagger en développement
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Your API Name v1");
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Backend API v1");
     });
 }
 
-// HTTPS Redirection
+// Middleware pour HTTPS
 app.UseHttpsRedirection();
 
-// CORS
-app.UseCors("AllowAll");
-
-// Authentication and Authorization
+// Middleware pour l'authentification et l'autorisation
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Global Error Handling
-app.UseExceptionHandler(errorApp =>
-{
-    errorApp.Run(async context =>
-    {
-        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-        context.Response.ContentType = "application/json";
-
-        var exceptionHandlerPathFeature = context.Features.Get<IExceptionHandlerPathFeature>();
-        if (exceptionHandlerPathFeature?.Error != null)
-        {
-            var errorMessage = new
-            {
-                Message = "An unexpected error occurred.",
-                Details = exceptionHandlerPathFeature.Error.Message
-            };
-
-            await context.Response.WriteAsync(JsonSerializer.Serialize(errorMessage));
-        }
-    });
-});
-
-// Map Controllers
+// Mapper les contrôleurs
 app.MapControllers();
 
-// Run the Application
+// Initialiser la base de données
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<AppDbContext>();
+    await DbInitializer.Initialize(context);
+}
+
+// Démarrer l'application
 app.Run();

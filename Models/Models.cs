@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Data;
 
 namespace Backend.Models
 {
@@ -12,6 +11,7 @@ namespace Backend.Models
         Enseignant,
         Admin
     }
+
     public enum StatutEvaluation
     {
         NonRemise,
@@ -20,80 +20,84 @@ namespace Backend.Models
 
     public class Utilisateur
     {
-            public int Id { get; set; }
-
-            [Required]
-            [MaxLength(255)]
-            public string Nom { get; set; } = string.Empty;
-
-            [Required]
-            [MaxLength(255)]
-            public string Prenom { get; set; } = string.Empty;
-
-            [Required]
-            [EmailAddress]
-            public string Email { get; set; } = string.Empty;
-
-            [Required]
-            [MaxLength(100)]
-            public string Password { get; set; } = string.Empty;
+        public int Id { get; set; }
 
         [Required]
-                public RoleUtilisateur Role { get; set; } // Enum pour les rôles
+        [MaxLength(255)]
+        public string Nom { get; set; } = string.Empty;
 
-                // Champ de stockage pour RoleString
-                private string _roleString;
+        [Required]
+        [MaxLength(255)]
+        public string Prenom { get; set; } = string.Empty;
 
-                // Propriété RoleString avec getter et setter
-                public string RoleString
-                {
-                    get => _roleString ?? Role.ToString(); // Retourne la valeur calculée si _roleString est null
-                    set => _roleString = value; // Permet à EF Core de définir la valeur
-                }
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; } = string.Empty;
 
+        [Required]
+        [MaxLength(100)]
+        public string Password { get; set; } = string.Empty;
 
-        // Navigation properties
-        public ICollection<Forum> Forums { get; set; } = new List<Forum>();
-            public ICollection<Commentaire> Commentaires { get; set; } = new List<Commentaire>();
+        [Required]
+        public RoleUtilisateur Role { get; set; }
 
-        // Relation avec Identifiant
-            public Identifiant? Identifiant { get; set; }
+        // Champ de stockage pour RoleString
+        private string? _roleString;
 
-
-            public Fichier? PhotoProfilFichier { get; set; } // Relation avec Fichier
+        // Propriété RoleString avec getter et setter
+        public string RoleString
+        {
+            get => _roleString ?? Role.ToString();
+            set => _roleString = value;
+        }
+        // Relations
+        public ICollection<Commentaire> Commentaires { get; set; } = new List<Commentaire>();
+        public ICollection<Message> Messages { get; set; } = new List<Message>();
+        public required Identifiant Identifiant { get; set; }
+        public Fichier? PhotoProfilFichier { get; set; }
     }
 
     public class Etudiant : Utilisateur
     {
+        // Relations
         public ICollection<Soumission> Soumissions { get; set; } = new List<Soumission>();
         public ICollection<Cours> Cours { get; set; } = new List<Cours>();
+
+        [ForeignKey("Classe")]
+        public int ClasseId { get; set; } // Ajout de la clé étrangère vers Classe
+        public Classe Classe { get; set; } = null!; // Navigation vers Classe
     }
 
     public class Enseignant : Utilisateur
     {
+        // Relations
         public ICollection<Cours> Cours { get; set; } = new List<Cours>();
         public ICollection<Soumission> Soumissions { get; set; } = new List<Soumission>();
     }
 
     public class Admin : Utilisateur
     {
+        // Relations
         public ICollection<Classe> Classes { get; set; } = new List<Classe>();
     }
+
     public class Classe
     {
         public int Id { get; set; }
 
         [Required]
         [MaxLength(255)]
-        public string Nom { get; set; }
+        public string Nom { get; set; } = string.Empty;
 
         public string? Description { get; set; }
 
-        [ForeignKey("Admin")]
-        public int AdminId { get; set; }
-        public Admin Admin { get; set; }
-
+        // Relations
+        public ICollection<Etudiant> Etudiants { get; set; } = new List<Etudiant>();
         public ICollection<Cours> Cours { get; set; } = new List<Cours>();
+
+        [ForeignKey("Admin")]
+        public int AdminId { get; set; } // Ajout de la clé étrangère vers Admin
+        public Admin Admin { get; set; } = null!; // Navigation vers Admin
     }
 
     public class Cours
@@ -102,41 +106,42 @@ namespace Backend.Models
 
         [Required]
         [MaxLength(255)]
-        public string Titre { get; set; }
+        public string Titre { get; set; } = string.Empty;
 
         public string? Description { get; set; }
 
+        // Relations
         [ForeignKey("Classe")]
         public int ClasseId { get; set; }
-        public Classe Classe { get; set; }
+        public Classe Classe { get; set; } = null!;
+
+        public Forum Forum { get; set; } = null!;
+        public ICollection<Lecon> Lecons { get; set; } = new List<Lecon>();
+        public ICollection<Evaluation> Evaluations { get; set; } = new List<Evaluation>();
 
         [ForeignKey("Enseignant")]
         public int EnseignantId { get; set; }
-        public Enseignant Enseignant { get; set; }
-
-        public ICollection<Lecon> Lecons { get; set; } = new List<Lecon>();
-        public ICollection<Evaluation> Evaluations { get; set; } = new List<Evaluation>();
-        public ICollection<Forum> Forums { get; set; } = new List<Forum>();
+        public Enseignant Enseignant { get; set; } = null!;
     }
+
     public class Commentaire
     {
         public int Id { get; set; }
 
         [Required]
-        public string Contenu { get; set; }
+        public string Contenu { get; set; } = string.Empty;
 
         public DateTimeOffset DateCreation { get; set; } = DateTimeOffset.UtcNow;
 
+        // Relations
         [ForeignKey("Lecon")]
         public int LeconId { get; set; }
-        public Lecon Lecon { get; set; }
+        public Lecon Lecon { get; set; } = null!;
 
         [ForeignKey("Utilisateur")]
         public int UtilisateurId { get; set; }
-        public Utilisateur Utilisateur { get; set; }
+        public Utilisateur Utilisateur { get; set; } = null!;
     }
-  
-
 
     public class Evaluation
     {
@@ -144,74 +149,64 @@ namespace Backend.Models
 
         [Required]
         [MaxLength(255)]
-        public string Titre { get; set; }
+        public string Titre { get; set; } = string.Empty;
 
         public string? Description { get; set; }
 
         [Required]
-        [CustomValidation(typeof(EvaluationValidator), nameof(EvaluationValidator.ValiderDateLimite))]
         public DateTimeOffset DateLimite { get; set; }
 
+        // Relations
         [ForeignKey("Cours")]
         public int CoursId { get; set; }
-        public Cours Cours { get; set; }
+        public Cours Cours { get; set; } = null!;
 
         public ICollection<Fichier> Fichiers { get; set; } = new List<Fichier>();
         public ICollection<Soumission> Soumissions { get; set; } = new List<Soumission>();
-
-        // Nouvelle propriété pour le statut de l'évaluation
-        public StatutEvaluation Statut { get; set; } = StatutEvaluation.NonRemise;
     }
+
     public class Fichier
     {
         public int Id { get; set; }
 
         [Required]
         [MaxLength(255)]
-        public string Nom { get; set; } = string.Empty; // Initialisation pour éviter CS8618
+        public string Nom { get; set; } = string.Empty;
 
         [Required]
-        public string Chemin { get; set; } = string.Empty; // Initialisation pour éviter CS8618
+        public string Chemin { get; set; } = string.Empty;
 
         [Required]
-        public string TypeFichier { get; set; } = string.Empty; // Initialisation pour éviter CS8618
+        public string TypeFichier { get; set; } = string.Empty;
 
-        // Relation avec Lecon (optionnelle)
+        // Relations
         [ForeignKey("Lecon")]
         public int? LeconId { get; set; }
         public Lecon? Lecon { get; set; }
 
-        // Relation avec Evaluation (optionnelle)
         [ForeignKey("Evaluation")]
         public int? EvaluationId { get; set; }
         public Evaluation? Evaluation { get; set; }
 
-        // Relation avec Soumission (optionnelle)
         [ForeignKey("Soumission")]
-        public int? SoumissionId { get; set; }
-        public Soumission? Soumission { get; set; }
+        public int? SoumissionId { get; set; } // Ajout de la clé étrangère vers Soumission
+        public Soumission? Soumission { get; set; } // Navigation vers Soumission
 
-        // Relation avec Utilisateur (optionnelle, pour la photo de profil)
         [ForeignKey("Utilisateur")]
-        public int? UtilisateurId { get; set; } // Nullable car optionnel
-        public Utilisateur? Utilisateur { get; set; } // Nullable car optionnel
+        public int? UtilisateurId { get; set; }
+        public Utilisateur? Utilisateur { get; set; }
     }
+
     public class Forum
     {
         public int Id { get; set; }
 
-        [Required]
-        public string Message { get; set; }
-
-        public DateTimeOffset DatePublication { get; set; } = DateTimeOffset.UtcNow;
-
+        // Relations
         [ForeignKey("Cours")]
         public int CoursId { get; set; }
-        public Cours Cours { get; set; }
+        public Cours Cours { get; set; } = null!;
 
-        [ForeignKey("Utilisateur")]
-        public int UtilisateurId { get; set; }
-        public Utilisateur Utilisateur { get; set; }
+        public ICollection<Message> Messages { get; set; } = new List<Message>();
     }
 
     public class Identifiant
@@ -224,55 +219,80 @@ namespace Backend.Models
         [Required]
         public string Type { get; set; } = string.Empty;
 
+        public bool EstUtilise { get; set; } = false; // Indique si l'identifiant a été utilisé
+
         [ForeignKey("Utilisateur")]
-        public int UtilisateurId { get; set; } // Clé étrangère vers Utilisateur
-        public Utilisateur Utilisateur { get; set; } // Navigation vers Utilisateur
+        public int? UtilisateurId { get; set; } // Clé étrangère vers Utilisateur
+        public Utilisateur? Utilisateur { get; set; } // Navigation vers Utilisateur
     }
 
-        public class Lecon
+    public class Lecon
     {
         public int Id { get; set; }
 
         [Required]
         [MaxLength(255)]
-        public string Titre { get; set; }
+        public string Titre { get; set; } = string.Empty;
 
         public string? Description { get; set; }
         public string? Contenu { get; set; }
 
+        // Relations
         [ForeignKey("Cours")]
         public int CoursId { get; set; }
-        public Cours Cours { get; set; }
+        public Cours Cours { get; set; } = null!;
 
         public ICollection<Fichier> Fichiers { get; set; } = new List<Fichier>();
-        public ICollection<Commentaire> Commentaires { get; set; } = new List<Commentaire>(); // Nouvelle collection
+        public ICollection<Commentaire> Commentaires { get; set; } = new List<Commentaire>();
     }
+
     public class Note
     {
         public int Id { get; set; }
+
         public float Valeur { get; set; }
 
+        // Relations
         [ForeignKey("Soumission")]
         public int SoumissionId { get; set; }
-        public Soumission Soumission { get; set; }
+        public Soumission Soumission { get; set; } = null!;
     }
 
     public class Soumission
     {
         public int Id { get; set; }
+
         public DateTimeOffset DateSoumission { get; set; }
 
-        public ICollection<Fichier> Fichiers { get; set; } = new List<Fichier>();
+        // Relations
+        [ForeignKey("Etudiant")]
+        public int EtudiantId { get; set; }
+        public Etudiant Etudiant { get; set; } = null!;
 
         [ForeignKey("Evaluation")]
         public int EvaluationId { get; set; }
-        public Evaluation Evaluation { get; set; }
+        public Evaluation Evaluation { get; set; } = null!;
 
-        [ForeignKey("Etudiant")]
-        public int EtudiantId { get; set; }
-        public Etudiant Etudiant { get; set; }
+        public ICollection<Fichier> Fichiers { get; set; } = new List<Fichier>();
+        public Note? Note { get; set; }
+    }
 
-        // Nouvelle propriété pour le statut de la soumission
-        public StatutEvaluation Statut { get; set; } = StatutEvaluation.NonRemise;
+    public class Message
+    {
+        public int Id { get; set; }
+
+        [Required]
+        public string Contenu { get; set; } = string.Empty;
+
+        public DateTimeOffset DatePublication { get; set; } = DateTimeOffset.UtcNow;
+
+        // Relations
+        [ForeignKey("Forum")]
+        public int ForumId { get; set; }
+        public Forum Forum { get; set; } = null!;
+
+        [ForeignKey("Utilisateur")]
+        public int UtilisateurId { get; set; }
+        public Utilisateur Utilisateur { get; set; } = null!;
     }
 }

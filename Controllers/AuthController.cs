@@ -20,14 +20,14 @@ namespace Backend.Controllers
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly AppDbContext _context;
         private readonly string _secretKey;
         private readonly ILogger<AuthController> _logger;
 
-        public AuthController(ApplicationDbContext context, IConfiguration configuration, ILogger<AuthController> logger)
+        public AuthController(AppDbContext context, IConfiguration configuration, ILogger<AuthController> logger)
         {
             _context = context;
-            _secretKey = configuration["Jwt:SecretKey"];
+            _secretKey = configuration["Jwt:SecretKey"] ?? throw new InvalidOperationException("JWT Secret Key is missing.");
             _logger = logger;
         }
 
@@ -35,38 +35,55 @@ namespace Backend.Controllers
         public async Task<IActionResult> Login([FromBody] UserLoginDto model)
         {
             if (string.IsNullOrWhiteSpace(model.Email) || string.IsNullOrWhiteSpace(model.Password))
+            {
+                _logger.LogWarning("Tentative de connexion avec des champs vides.");
                 return BadRequest(new { Message = "Email et mot de passe sont obligatoires." });
+            }
 
             // Validation du format de l'email
             if (!Regex.IsMatch(model.Email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
             {
+                _logger.LogWarning($"Format d'email invalide : {model.Email}");
                 return BadRequest(new { Message = "Format d'email invalide." });
             }
 
-            _logger.LogInformation($"Email: {model.Email}");
+            _logger.LogInformation($"Tentative de connexion pour l'email : {model.Email}");
 
             try
             {
-                var user = await _context.Utilisateurs.FirstOrDefaultAsync(u => u.Email == model.Email);
-                _logger.LogInformation($"User found: {user != null}");
+                // Rechercher l'utilisateur par email
+                _logger.LogInformation("Recherche de l'utilisateur dans la base de données...");
+                var user = await _context.Utilisateurs
+                    .Include(u => u.Identifiant) // Charger l'identifiant associé
+                    .FirstOrDefaultAsync(u => u.Email == model.Email);
 
-                if (user == null || !PasswordHasher.VerifyPassword(model.Password, user.Password))
+                if (user == null)
                 {
+                    _logger.LogWarning($"Aucun utilisateur trouvé avec l'email : {model.Email}");
                     return Unauthorized(new { Message = "Email ou mot de passe incorrect." });
                 }
 
+                _logger.LogInformation("Utilisateur trouvé. Vérification du mot de passe...");
+
+                // Vérifier le mot de passe
+                if (!PasswordHasher.VerifyPassword(model.Password, user.Password))
+                {
+                    _logger.LogWarning("Mot de passe incorrect.");
+                    return Unauthorized(new { Message = "Email ou mot de passe incorrect." });
+                }
+
+                _logger.LogInformation("Mot de passe vérifié. Génération du token JWT...");
+
+                // Générer un token JWT
                 var token = GenerateJwtToken(user);
+
+                _logger.LogInformation("Token généré avec succès.");
                 return Ok(new { Token = token });
-            }
-            catch (Microsoft.EntityFrameworkCore.DbUpdateException ex)
-            {
-                _logger.LogError(ex, "Database update error occurred while processing the login request.");
-                return StatusCode(500, new { Message = "A database error occurred while processing your request." });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected error occurred while processing the login request.");
-                return StatusCode(500, new { Message = "An error occurred while processing your request." });
+                _logger.LogError(ex, "Une erreur s'est produite lors de la tentative de connexion.");
+                return StatusCode(500, new { Message = "Une erreur s'est produite lors de la connexion." });
             }
         }
 
@@ -96,24 +113,36 @@ namespace Backend.Controllers
             if (!Enum.IsDefined(typeof(RoleUtilisateur), model.Role))
                 return BadRequest(new { Message = "Rôle invalide." });
 
-            // Validation du CIN pour les étudiants et enseignants
-            if (model.Role == RoleUtilisateur.Etudiant || model.Role == RoleUtilisateur.Enseignant)
-            {
-                if (string.IsNullOrWhiteSpace(model.CIN))
-                    return BadRequest(new { Message = "Le CIN est obligatoire pour les étudiants et enseignants." });
-            }
-
-            // Validation de la SuperKey pour les admins
-            if (model.Role == RoleUtilisateur.Admin)
-            {
-                if (string.IsNullOrWhiteSpace(model.SuperKey))
-                    return BadRequest(new { Message = "La SuperKey est obligatoire pour les admins." });
-            }
-
             // Vérifier si l'utilisateur existe déjà
             var existingUser = await _context.Utilisateurs.FirstOrDefaultAsync(u => u.Email == model.Email);
             if (existingUser != null)
                 return BadRequest(new { Message = "Un utilisateur avec cet email existe déjà." });
+
+            // Vérifier l'identifiant (CIN ou SuperKey) en fonction du rôle
+            if (model.Role == RoleUtilisateur.Etudiant || model.Role == RoleUtilisateur.Enseignant)
+            {
+                if (string.IsNullOrWhiteSpace(model.CIN))
+                    return BadRequest(new { Message = "Le CIN est obligatoire pour les étudiants et enseignants." });
+
+                // Vérifier que le CIN existe et n'est pas déjà utilisé
+                var identifiant = await _context.Identifiants
+                    .FirstOrDefaultAsync(i => i.CIN == model.CIN && !i.EstUtilise);
+
+                if (identifiant == null)
+                    return BadRequest(new { Message = "CIN invalide ou déjà utilisé." });
+            }
+            else if (model.Role == RoleUtilisateur.Admin)
+            {
+                if (string.IsNullOrWhiteSpace(model.SuperKey))
+                    return BadRequest(new { Message = "La SuperKey est obligatoire pour les admins." });
+
+                // Vérifier que la SuperKey existe et n'est pas déjà utilisée
+                var identifiant = await _context.Identifiants
+                    .FirstOrDefaultAsync(i => i.SuperKey == model.SuperKey && !i.EstUtilise);
+
+                if (identifiant == null)
+                    return BadRequest(new { Message = "SuperKey invalide ou déjà utilisée." });
+            }
 
             // Hacher le mot de passe
             var hashedPassword = PasswordHasher.HashPassword(model.Password);
@@ -123,6 +152,13 @@ namespace Backend.Controllers
             switch (model.Role)
             {
                 case RoleUtilisateur.Etudiant:
+                    // Normaliser le nom de la classe (insensible à la casse)
+                    var classe = await _context.Classes
+                        .FirstOrDefaultAsync(c => c.Nom.ToUpper() == model.ClasseNom.ToUpper());
+
+                    if (classe == null)
+                        return BadRequest(new { Message = "La classe spécifiée n'existe pas." });
+
                     newUser = new Etudiant
                     {
                         Nom = model.Nom,
@@ -130,11 +166,9 @@ namespace Backend.Controllers
                         Email = model.Email,
                         Password = hashedPassword,
                         Role = model.Role,
-                        Identifiant = new Identifiant
-                        {
-                            CIN = model.CIN,
-                            Type = "Etudiant"
-                        }
+                        Identifiant = await _context.Identifiants
+                            .FirstOrDefaultAsync(i => i.CIN == model.CIN && !i.EstUtilise),
+                        ClasseId = classe.Id // Associer l'étudiant à la classe trouvée
                     };
                     break;
 
@@ -146,11 +180,8 @@ namespace Backend.Controllers
                         Email = model.Email,
                         Password = hashedPassword,
                         Role = model.Role,
-                        Identifiant = new Identifiant
-                        {
-                            CIN = model.CIN,
-                            Type = "Enseignant"
-                        }
+                        Identifiant = await _context.Identifiants
+                            .FirstOrDefaultAsync(i => i.CIN == model.CIN && !i.EstUtilise)
                     };
                     break;
 
@@ -162,17 +193,17 @@ namespace Backend.Controllers
                         Email = model.Email,
                         Password = hashedPassword,
                         Role = model.Role,
-                        Identifiant = new Identifiant
-                        {
-                            SuperKey = model.SuperKey,
-                            Type = "Admin"
-                        }
+                        Identifiant = await _context.Identifiants
+                            .FirstOrDefaultAsync(i => i.SuperKey == model.SuperKey && !i.EstUtilise)
                     };
                     break;
 
                 default:
                     return BadRequest(new { Message = "Rôle invalide." });
             }
+
+            // Marquer l'identifiant comme utilisé
+            newUser.Identifiant.EstUtilise = true;
 
             // Ajouter l'utilisateur à la base de données
             _context.Utilisateurs.Add(newUser);
@@ -184,7 +215,6 @@ namespace Backend.Controllers
             // Retourner le token
             return Ok(new { Token = token });
         }
-
         private string GenerateJwtToken(Utilisateur user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -196,7 +226,7 @@ namespace Backend.Controllers
                     new Claim("id", user.Id.ToString()),
                     new Claim(ClaimTypes.Role, user.Role.ToString())
                 }),
-                Expires = DateTime.UtcNow.AddHours(1),
+                Expires = DateTime.UtcNow.AddHours(1), // Token valide pendant 1 heure
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
@@ -208,19 +238,19 @@ namespace Backend.Controllers
     {
         [Required]
         [MaxLength(255)]
-        public string Nom { get; set; }
+        public string Nom { get; set; } = string.Empty;
 
         [Required]
         [MaxLength(255)]
-        public string Prenom { get; set; }
+        public string Prenom { get; set; } = string.Empty;
 
         [Required]
         [EmailAddress]
-        public string Email { get; set; }
+        public string Email { get; set; } = string.Empty;
 
         [Required]
         [MaxLength(100)]
-        public string Password { get; set; }
+        public string Password { get; set; } = string.Empty;
 
         [Required]
         public RoleUtilisateur Role { get; set; } // Enum pour les rôles
@@ -228,12 +258,19 @@ namespace Backend.Controllers
         // Identifiant (CIN ou SuperKey)
         public string? CIN { get; set; } // Pour les étudiants et enseignants
         public string? SuperKey { get; set; } // Pour les admins
+
+        // Champ pour spécifier le nom de la classe (uniquement pour les étudiants)
+        public string? ClasseNom { get; set; }
     }
 
     public class UserLoginDto
     {
-        public string Email { get; set; }
-        public string Password { get; set; }
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; } = string.Empty;
+
+        [Required]
+        public string Password { get; set; } = string.Empty;
     }
 
     public static class PasswordHasher
