@@ -169,3 +169,4 @@ C:\Learning\Programmation\DATA_BASE\C#.Net\Skills\Backend\Backend\bin\Debug\net9
 C:\Learning\Programmation\DATA_BASE\C#.Net\Skills\Backend\Backend\bin\Debug\net9.0\BCrypt.Net-Next.dll
 C:\Learning\Programmation\DATA_BASE\C#.Net\Skills\Backend\Backend\bin\Debug\net9.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
 C:\Learning\Programmation\DATA_BASE\C#.Net\Skills\Backend\Backend\obj\Debug\net9.0\staticwebassets.upToDateCheck.txt
+C:\Learning\Programmation\DATA_BASE\C#.Net\Skills\Backend\Backend\obj\Debug\net9.0\Backend.sourcelink.json

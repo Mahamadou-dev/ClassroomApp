@@ -95,20 +95,56 @@ namespace Backend.Controllers
         }
 
         // POST: api/identifiants
+        // POST: api/identifiants
         [HttpPost]
         public async Task<ActionResult<IdentifiantDto>> PostIdentifiant(IdentifiantDto identifiantDto)
         {
+            // Validation du type
+            if (string.IsNullOrEmpty(identifiantDto.Type))
+            {
+                return BadRequest(new { Message = "Le type est requis." });
+            }
+
+            // Validation des champs en fonction du type
+            if (identifiantDto.Type == "Enseignant" && string.IsNullOrEmpty(identifiantDto.SuperKey))
+            {
+                return BadRequest(new { Message = "SuperKey est requis pour un enseignant." });
+            }
+
+            if (identifiantDto.Type == "Etudiant" && string.IsNullOrEmpty(identifiantDto.CIN))
+            {
+                return BadRequest(new { Message = "CIN est requis pour un étudiant." });
+            }
+
+            // Créer l'identifiant
             var identifiant = new Identifiant
             {
                 Type = identifiantDto.Type,
-                SuperKey = identifiantDto.SuperKey,
-                CIN = identifiantDto.CIN,
                 EstUtilise = identifiantDto.EstUtilise
             };
 
+            // Définir SuperKey ou CIN en fonction du type
+            if (identifiantDto.Type == "Enseignant")
+            {
+                identifiant.SuperKey = identifiantDto.SuperKey;
+                identifiant.CIN = null; // Assurez-vous que CIN est null
+            }
+            else if (identifiantDto.Type == "Etudiant")
+            {
+                identifiant.CIN = identifiantDto.CIN;
+                identifiant.SuperKey = null; // Assurez-vous que SuperKey est null
+            }
+            else
+            {
+                // Si le type n'est ni "Enseignant" ni "Etudiant", retourner une erreur
+                return BadRequest(new { Message = "Le type doit être 'Enseignant' ou 'Etudiant'." });
+            }
+
+            // Ajouter l'identifiant à la base de données
             _context.Identifiants.Add(identifiant);
             await _context.SaveChangesAsync();
 
+            // Retourner l'identifiant créé
             return CreatedAtAction(nameof(GetIdentifiants), new { id = identifiant.Id }, identifiantDto);
         }
 
@@ -135,6 +171,7 @@ namespace Backend.Controllers
             {
                 identifiant = await _context.Identifiants
                     .FirstOrDefaultAsync(i => i.CIN == cin);
+
             }
             else if (!string.IsNullOrWhiteSpace(superKey))
             {
@@ -160,9 +197,9 @@ namespace Backend.Controllers
     public class IdentifiantDto
     {
         public int Id { get; set; }
-        public string Type { get; set; }
-        public string SuperKey { get; set; }
-        public string CIN { get; set; }
+        public required string Type { get; set; }
+        public string? SuperKey { get; set; }
+        public string? CIN { get; set; }
         public bool EstUtilise { get; set; }
     }
 

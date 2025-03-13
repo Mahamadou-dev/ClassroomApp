@@ -67,6 +67,462 @@
         }
       }
     },
+    "/api/Classes": {
+      "post": {
+        "tags": [
+          "Classes"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClasseDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClasseDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClasseDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClasseResponseDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClasseResponseDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClasseResponseDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Classes"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ClasseResponseDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ClasseResponseDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ClasseResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Classes/{id}": {
+      "put": {
+        "tags": [
+          "Classes"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClasseDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClasseDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClasseDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Classes/by-name/{nom}": {
+      "get": {
+        "tags": [
+          "Classes"
+        ],
+        "parameters": [
+          {
+            "name": "nom",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClasseResponseDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClasseResponseDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClasseResponseDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Classes"
+        ],
+        "parameters": [
+          {
+            "name": "nom",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Cours/by-classe/{nomClasse}": {
+      "get": {
+        "tags": [
+          "Cours"
+        ],
+        "parameters": [
+          {
+            "name": "nomClasse",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CoursResponseDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CoursResponseDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CoursResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Cours": {
+      "get": {
+        "tags": [
+          "Cours"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CoursResponseDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CoursResponseDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CoursResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Cours"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCoursDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCoursDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCoursDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CoursResponseDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CoursResponseDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CoursResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Cours/etudiant": {
+      "get": {
+        "tags": [
+          "Cours"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CoursResponseDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CoursResponseDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CoursResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Cours/{id}": {
+      "put": {
+        "tags": [
+          "Cours"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCoursDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCoursDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCoursDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Cours"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Cours/enseignant": {
+      "get": {
+        "tags": [
+          "Cours"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CoursResponseDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CoursResponseDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CoursResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/Identifiants": {
       "get": {
         "tags": [
@@ -262,11 +718,1236 @@
           }
         }
       }
+    },
+    "/api/Users/admin": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Users/enseignants": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EnseignantResponseDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EnseignantResponseDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EnseignantResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateEnseignantDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateEnseignantDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateEnseignantDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnseignantResponseDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnseignantResponseDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnseignantResponseDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Users/etudiants": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EtudiantResponseDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EtudiantResponseDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EtudiantResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateEtudiantDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateEtudiantDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateEtudiantDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Etudiant"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Etudiant"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Etudiant"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Users/etudiants/classe/{nomClasse}": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "parameters": [
+          {
+            "name": "nomClasse",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EtudiantResponseDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EtudiantResponseDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EtudiantResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Users/etudiants/{id}": {
+      "delete": {
+        "tags": [
+          "Users"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Users/enseignants/{id}": {
+      "delete": {
+        "tags": [
+          "Users"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Users/etudiant/current": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/EtudiantResponseDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EtudiantResponseDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EtudiantResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Users/enseignant/current": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnseignantResponseDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnseignantResponseDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnseignantResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "Admin": {
+        "required": [
+          "email",
+          "identifiant",
+          "nom",
+          "password",
+          "prenom",
+          "role"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nom": {
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          },
+          "prenom": {
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          },
+          "email": {
+            "minLength": 1,
+            "type": "string",
+            "format": "email"
+          },
+          "password": {
+            "maxLength": 100,
+            "minLength": 1,
+            "type": "string"
+          },
+          "role": {
+            "$ref": "#/components/schemas/RoleUtilisateur"
+          },
+          "roleString": {
+            "type": "string",
+            "nullable": true
+          },
+          "commentaires": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Commentaire"
+            },
+            "nullable": true
+          },
+          "messages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Message"
+            },
+            "nullable": true
+          },
+          "identifiant": {
+            "$ref": "#/components/schemas/Identifiant"
+          },
+          "photoProfilFichier": {
+            "$ref": "#/components/schemas/Fichier"
+          },
+          "classes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Classe"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "AdminDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nom": {
+            "type": "string",
+            "nullable": true
+          },
+          "prenom": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "role": {
+            "type": "string",
+            "nullable": true
+          },
+          "superKey": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Classe": {
+        "required": [
+          "nom"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nom": {
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "etudiants": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Etudiant"
+            },
+            "nullable": true
+          },
+          "cours": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Cours"
+            },
+            "nullable": true
+          },
+          "adminId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "admin": {
+            "$ref": "#/components/schemas/Admin"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ClasseDto": {
+        "type": "object",
+        "properties": {
+          "nom": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ClasseResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nom": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "adminId": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Commentaire": {
+        "required": [
+          "contenu"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "contenu": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "dateCreation": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "leconId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "lecon": {
+            "$ref": "#/components/schemas/Lecon"
+          },
+          "utilisateurId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "utilisateur": {
+            "$ref": "#/components/schemas/Utilisateur"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cours": {
+        "required": [
+          "titre"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "titre": {
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "classeId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "classe": {
+            "$ref": "#/components/schemas/Classe"
+          },
+          "forum": {
+            "$ref": "#/components/schemas/Forum"
+          },
+          "lecons": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Lecon"
+            },
+            "nullable": true
+          },
+          "evaluations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Evaluation"
+            },
+            "nullable": true
+          },
+          "enseignantId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "enseignant": {
+            "$ref": "#/components/schemas/Enseignant"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CoursResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "titre": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "nomClasse": {
+            "type": "string",
+            "nullable": true
+          },
+          "enseignantId": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateCoursDto": {
+        "required": [
+          "nomClasse",
+          "titre"
+        ],
+        "type": "object",
+        "properties": {
+          "titre": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "nomClasse": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateEnseignantDto": {
+        "required": [
+          "email",
+          "nom",
+          "password",
+          "prenom",
+          "superKey"
+        ],
+        "type": "object",
+        "properties": {
+          "nom": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "prenom": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "email": {
+            "minLength": 1,
+            "type": "string",
+            "format": "email"
+          },
+          "password": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "superKey": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateEtudiantDto": {
+        "required": [
+          "cin",
+          "email",
+          "nom",
+          "nomClasse",
+          "password",
+          "prenom"
+        ],
+        "type": "object",
+        "properties": {
+          "nom": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "prenom": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "email": {
+            "minLength": 1,
+            "type": "string",
+            "format": "email"
+          },
+          "password": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "cin": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "nomClasse": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Enseignant": {
+        "required": [
+          "email",
+          "identifiant",
+          "nom",
+          "password",
+          "prenom",
+          "role"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nom": {
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          },
+          "prenom": {
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          },
+          "email": {
+            "minLength": 1,
+            "type": "string",
+            "format": "email"
+          },
+          "password": {
+            "maxLength": 100,
+            "minLength": 1,
+            "type": "string"
+          },
+          "role": {
+            "$ref": "#/components/schemas/RoleUtilisateur"
+          },
+          "roleString": {
+            "type": "string",
+            "nullable": true
+          },
+          "commentaires": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Commentaire"
+            },
+            "nullable": true
+          },
+          "messages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Message"
+            },
+            "nullable": true
+          },
+          "identifiant": {
+            "$ref": "#/components/schemas/Identifiant"
+          },
+          "photoProfilFichier": {
+            "$ref": "#/components/schemas/Fichier"
+          },
+          "cours": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Cours"
+            },
+            "nullable": true
+          },
+          "soumissions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Soumission"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "EnseignantResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nom": {
+            "type": "string",
+            "nullable": true
+          },
+          "prenom": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "superKey": {
+            "type": "string",
+            "nullable": true
+          },
+          "coursCrees": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Etudiant": {
+        "required": [
+          "email",
+          "identifiant",
+          "nom",
+          "password",
+          "prenom",
+          "role"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nom": {
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          },
+          "prenom": {
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          },
+          "email": {
+            "minLength": 1,
+            "type": "string",
+            "format": "email"
+          },
+          "password": {
+            "maxLength": 100,
+            "minLength": 1,
+            "type": "string"
+          },
+          "role": {
+            "$ref": "#/components/schemas/RoleUtilisateur"
+          },
+          "roleString": {
+            "type": "string",
+            "nullable": true
+          },
+          "commentaires": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Commentaire"
+            },
+            "nullable": true
+          },
+          "messages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Message"
+            },
+            "nullable": true
+          },
+          "identifiant": {
+            "$ref": "#/components/schemas/Identifiant"
+          },
+          "photoProfilFichier": {
+            "$ref": "#/components/schemas/Fichier"
+          },
+          "soumissions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Soumission"
+            },
+            "nullable": true
+          },
+          "cours": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Cours"
+            },
+            "nullable": true
+          },
+          "classeId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "classe": {
+            "$ref": "#/components/schemas/Classe"
+          }
+        },
+        "additionalProperties": false
+      },
+      "EtudiantResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nom": {
+            "type": "string",
+            "nullable": true
+          },
+          "prenom": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "cin": {
+            "type": "string",
+            "nullable": true
+          },
+          "nomClasse": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Evaluation": {
+        "required": [
+          "dateLimite",
+          "titre"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "titre": {
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "dateLimite": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "coursId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "cours": {
+            "$ref": "#/components/schemas/Cours"
+          },
+          "fichiers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Fichier"
+            },
+            "nullable": true
+          },
+          "soumissions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Soumission"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Fichier": {
+        "required": [
+          "chemin",
+          "nom",
+          "typeFichier"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nom": {
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          },
+          "chemin": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "typeFichier": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "leconId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "lecon": {
+            "$ref": "#/components/schemas/Lecon"
+          },
+          "evaluationId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "evaluation": {
+            "$ref": "#/components/schemas/Evaluation"
+          },
+          "soumissionId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "soumission": {
+            "$ref": "#/components/schemas/Soumission"
+          },
+          "utilisateurId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "utilisateur": {
+            "$ref": "#/components/schemas/Utilisateur"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Forum": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "coursId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "cours": {
+            "$ref": "#/components/schemas/Cours"
+          },
+          "messages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Message"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Identifiant": {
+        "required": [
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "cin": {
+            "type": "string",
+            "nullable": true
+          },
+          "superKey": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "estUtilise": {
+            "type": "boolean"
+          },
+          "utilisateurId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "utilisateur": {
+            "$ref": "#/components/schemas/Utilisateur"
+          }
+        },
+        "additionalProperties": false
+      },
       "IdentifiantDto": {
+        "required": [
+          "type"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -319,6 +2000,109 @@
         },
         "additionalProperties": false
       },
+      "Lecon": {
+        "required": [
+          "titre"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "titre": {
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "contenu": {
+            "type": "string",
+            "nullable": true
+          },
+          "coursId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "cours": {
+            "$ref": "#/components/schemas/Cours"
+          },
+          "fichiers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Fichier"
+            },
+            "nullable": true
+          },
+          "commentaires": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Commentaire"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Message": {
+        "required": [
+          "contenu"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "contenu": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "datePublication": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "forumId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "forum": {
+            "$ref": "#/components/schemas/Forum"
+          },
+          "utilisateurId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "utilisateur": {
+            "$ref": "#/components/schemas/Utilisateur"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Note": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "valeur": {
+            "type": "number",
+            "format": "float"
+          },
+          "soumissionId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "soumission": {
+            "$ref": "#/components/schemas/Soumission"
+          }
+        },
+        "additionalProperties": false
+      },
       "RoleUtilisateur": {
         "enum": [
           0,
@@ -327,6 +2111,80 @@
         ],
         "type": "integer",
         "format": "int32"
+      },
+      "Soumission": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "dateSoumission": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "etudiantId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "etudiant": {
+            "$ref": "#/components/schemas/Etudiant"
+          },
+          "evaluationId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "evaluation": {
+            "$ref": "#/components/schemas/Evaluation"
+          },
+          "fichiers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Fichier"
+            },
+            "nullable": true
+          },
+          "note": {
+            "$ref": "#/components/schemas/Note"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateCoursDto": {
+        "type": "object",
+        "properties": {
+          "titre": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateUserDto": {
+        "type": "object",
+        "properties": {
+          "nom": {
+            "type": "string",
+            "nullable": true
+          },
+          "prenom": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "password": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
       },
       "UserLoginDto": {
         "required": [
@@ -391,6 +2249,71 @@
           "classeNom": {
             "type": "string",
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Utilisateur": {
+        "required": [
+          "email",
+          "identifiant",
+          "nom",
+          "password",
+          "prenom",
+          "role"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nom": {
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          },
+          "prenom": {
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          },
+          "email": {
+            "minLength": 1,
+            "type": "string",
+            "format": "email"
+          },
+          "password": {
+            "maxLength": 100,
+            "minLength": 1,
+            "type": "string"
+          },
+          "role": {
+            "$ref": "#/components/schemas/RoleUtilisateur"
+          },
+          "roleString": {
+            "type": "string",
+            "nullable": true
+          },
+          "commentaires": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Commentaire"
+            },
+            "nullable": true
+          },
+          "messages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Message"
+            },
+            "nullable": true
+          },
+          "identifiant": {
+            "$ref": "#/components/schemas/Identifiant"
+          },
+          "photoProfilFichier": {
+            "$ref": "#/components/schemas/Fichier"
           }
         },
         "additionalProperties": false

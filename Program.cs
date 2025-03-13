@@ -5,8 +5,16 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// pour éviter les références circulaires
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+    });
 
 // Configuration de la base de données
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -34,11 +42,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 // Configuration de l'autorisation
 builder.Services.AddAuthorization(options =>
 {
-    // Politique pour les admins uniquement
     options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
-
-    // Politique pour les admins et les enseignants
     options.AddPolicy("AdminAndEnseignant", policy => policy.RequireRole("Admin", "Enseignant"));
+    options.AddPolicy("EnseignantOnly", policy => policy.RequireRole("Enseignant"));
+    options.AddPolicy("EtudiantOnly", policy => policy.RequireRole("Etudiant"));
 });
 
 // Ajouter les contrôleurs
@@ -48,6 +55,29 @@ builder.Services.AddControllers();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Backend API", Version = "v1" });
+
+    // Ajouter la configuration pour l'authentification JWT
+    var securityScheme = new OpenApiSecurityScheme
+    {
+        Name = "JWT Authentication",
+        Description = "Entrez votre token JWT dans le champ ci-dessous.",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer", // "bearer" doit être en minuscules
+        BearerFormat = "JWT",
+        Reference = new OpenApiReference
+        {
+            Id = JwtBearerDefaults.AuthenticationScheme,
+            Type = ReferenceType.SecurityScheme
+        }
+    };
+
+    c.AddSecurityDefinition(securityScheme.Reference.Id, securityScheme);
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        { securityScheme, Array.Empty<string>() }
+    });
 });
 
 var app = builder.Build();
